@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head th:fragment="header">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Books</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+<nav class="site-header sticky-top py-1" th:fragment="navigation">
+    <div class="container d-flex flex-column flex-md-row ">
+        <a class="py-2 d-none d-md-inline-block" href="/">My Collection</a>
+        <a class="pl-4 py-2 d-none d-md-inline-block" href="/books">Search Books</a>
+    </div>
+</nav>
+<section class="jumbotron text-center">
+    <div class="container">
+        <h1 class="jumbotron-heading">Books</h1>
+        <p class="lead text-muted">Search for books and add them to your collection.</p>
+        <p>
+        <form th:action="@{/books}" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control form-control-lg" th:name="text" placeholder="Search books by title">
+                <button type="submit" class="btn btn-primary btn-lg ml-2">Search</button>
+            </div>
+        </form>
+        </p>
+    </div>
+</section>
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-12 mt-2" th:each="book : ${books}">
+            <div class="card">
+                <div class="card-img-top d-flex align-items-start bg-light">
+                    <img style="height: 70px; width: 50px;" th:src="${book.smallImageUrl}">
+                    <div class="card-body pt-1 pb-1">
+                        <h6 class="card-title font-weight-bold" th:text="${book.title}"></h6>
+                        <p class="card-text">
+                            <span th:text="${book.authors}"></span>
+                            <span class="badge badge-info" th:text="${book.originalPublicationYear}"></span>
+                            
+                        </p>
+                    </div>
+                    <form th:action="@{/add/{bookId}(bookId=${book.bookId})}" method="post" class="p-2">
+                        <button type="submit" class="btn btn-secondary btn-sm float-right">Add</button>
+                    </form>
+                </div>
+
+                
+            </div>
+        </div>
+        
+        <!--<div class="col-md-4" th:each="book : ${books}">
+            <div class="card mb-4 box-shadow">
+                <img class="card-img-top" data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=Thumbnail" alt="Thumbnail [100%x225]" style="height: 225px; width: 100%; display: block;" 
+                     th:src="${book.imageUrl}" data-holder-rendered="true">
+                <div class="card-body">
+                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </div>
+                        <small class="text-muted">9 mins</small>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+        
+    </div>
+</div>
+
+</body>
+</html>
