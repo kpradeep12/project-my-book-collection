@@ -25,12 +25,21 @@ public class CollectionController {
     @Autowired ReaderRepository readerRepository;
     @Autowired BookRepository bookRepository;
     
-    @GetMapping
-    public String collection(Model model, Authentication authentication) {
-        model.addAttribute("username", authentication.getName());
-        List books = readerRepository.findByUsername(authentication.getName()).get().getBookCollection().stream()
+    @GetMapping("/{userId}")
+    public String collection(@PathVariable("userId") String userId, Model model) {
+        
+        model.addAttribute("username", userId);
+        
+        Optional<Reader> reader = readerRepository.findByUsername(userId);
+        if(reader.isEmpty()) return "error";
+        
+        List books = reader.get().getBookCollection().stream()
                 .map(collection -> collection.getBook()).collect(Collectors.toList());
         model.addAttribute("books", books);
+        model.addAttribute("userName", reader.get().getFirstName()
+                .concat(" ")
+                .concat(reader.get().getLastName())
+        );
         return "collection";
     }
     
