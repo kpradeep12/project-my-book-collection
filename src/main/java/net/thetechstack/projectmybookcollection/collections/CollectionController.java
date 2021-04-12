@@ -28,14 +28,13 @@ public class CollectionController {
     @GetMapping("/{userId}")
     public String collection(@PathVariable("userId") String userId, Model model) {
         
-        model.addAttribute("username", userId);
-        
         Optional<Reader> reader = readerRepository.findByUsername(userId);
         if(reader.isEmpty()) return "error";
         
         List books = reader.get().getBookCollection().stream()
                 .map(collection -> collection.getBook()).collect(Collectors.toList());
         model.addAttribute("books", books);
+        model.addAttribute("userId", userId);
         model.addAttribute("userName", reader.get().getFirstName()
                 .concat(" ")
                 .concat(reader.get().getLastName())
@@ -43,25 +42,33 @@ public class CollectionController {
         return "collection";
     }
     
-    @PostMapping("/add/{bookId}")
-    public RedirectView addBook(@PathVariable("bookId") Integer bookId, Model model, Authentication authentication) {
+    @PostMapping("/{userId}/add/{bookId}")
+    public RedirectView addBook(@PathVariable("userId") String userId, @PathVariable("bookId") Integer bookId, Model model, Authentication authentication) {
+
         Optional<Reader> reader = readerRepository.findByUsername(authentication.getName());
+        if(!reader.get().getUsername().equals(userId))
+            return new RedirectView("/error");
+
         Optional<Book> book = bookRepository.findById(bookId);
         if(reader.isPresent() && book.isPresent()) {
             Collection collection = new Collection(reader.get(), book.get());
             collectionRepository.save(collection);
         }
-        return new RedirectView("/");
+        return new RedirectView("/" + userId);
     }
 
-    @PostMapping("/remove/{bookId}")
-    public RedirectView remove(@PathVariable("bookId") Integer bookId, Model model, Authentication authentication) {
+    @PostMapping("/{userId}/remove/{bookId}")
+    public RedirectView remove(@PathVariable("userId") String userId, @PathVariable("bookId") Integer bookId, Model model, Authentication authentication) {
         Optional<Reader> reader = readerRepository.findByUsername(authentication.getName());
+
+        if(!reader.get().getUsername().equals(userId))
+            return new RedirectView("/error");
+
         Optional<Book> book = bookRepository.findById(bookId);
         if(reader.isPresent() && book.isPresent()) {
             Collection collection = new Collection(reader.get(), book.get());
             collectionRepository.delete(collection);
         }
-        return new RedirectView("/");
+        return new RedirectView("/" + userId);
     }
 }
